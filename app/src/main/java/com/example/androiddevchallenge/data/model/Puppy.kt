@@ -18,6 +18,7 @@ package com.example.androiddevchallenge.data.model
 import androidx.annotation.DrawableRes
 
 data class Puppy(
+    val id: Int,
     val name: String,
     val breed: String,
     val origin: String,

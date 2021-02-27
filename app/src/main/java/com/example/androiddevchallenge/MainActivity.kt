@@ -20,6 +20,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.data.puppies
 import com.example.androiddevchallenge.ui.theme.MyTheme
@@ -35,8 +36,16 @@ class MainActivity : AppCompatActivity() {
                         HomeScreen(
                             puppies = puppies,
                             detailNavigator = {
+                                navController.navigate("puppy/${it.id}")
                             }
                         )
+                    }
+                    composable("puppy/{id}") { navBackStackEntry ->
+                        val id = navBackStackEntry.arguments?.getInt("id", 0)
+                        val puppy = puppies.first { it.id == id }
+                        DetailScreen(puppy) {
+                            navController.popBackStack()
+                        }
                     }
                 }
             }
