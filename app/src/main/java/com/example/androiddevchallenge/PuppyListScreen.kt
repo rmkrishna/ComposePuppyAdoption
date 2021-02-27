@@ -94,7 +94,7 @@ private fun HomeScreenAppBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(56.dp)
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .shadow(4.dp, shape = RoundedCornerShape(8.dp), clip = false)
             .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(8.dp)),
