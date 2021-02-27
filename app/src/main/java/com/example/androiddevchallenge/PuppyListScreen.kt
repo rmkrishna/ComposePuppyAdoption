@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -44,7 +45,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -63,12 +67,18 @@ fun HomeScreen(
     val list = puppies
     var searchState by remember { mutableStateOf(TextFieldValue("")) }
 
+    var textFieldFocusState by remember { mutableStateOf(false) }
+
     Column {
         HomeScreenAppBar(
             searchState,
             onTextChanged = {
                 searchState = it
-            }
+            },
+            onTextFieldFocused = { focused ->
+                textFieldFocusState = focused
+            },
+            focusState = textFieldFocusState
         )
         PuppyListView(list, detailNavigator)
     }
@@ -77,18 +87,22 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenAppBar(
     textFieldValue: TextFieldValue,
-    onTextChanged: (TextFieldValue) -> Unit
+    onTextChanged: (TextFieldValue) -> Unit,
+    onTextFieldFocused: (Boolean) -> Unit,
+    focusState: Boolean
 ) {
-    Box(modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 8.dp)
-                .shadow(4.dp, shape = RoundedCornerShape(8.dp), clip = false)
-                .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(8.dp)),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .shadow(4.dp, shape = RoundedCornerShape(8.dp), clip = false)
+            .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(8.dp)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box {
+            var lastFocusState by remember { mutableStateOf(FocusState.Inactive) }
+
             BasicTextField(
                 value = textFieldValue,
                 onValueChange = onTextChanged,
@@ -100,9 +114,26 @@ private fun HomeScreenAppBar(
                 ),
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .onFocusChanged { state ->
+                        if (lastFocusState != state) {
+                            onTextFieldFocused(state == FocusState.Active)
+                        }
+                        lastFocusState = state
+                    },
             )
+
+            val disableContentColor =
+                MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+            if (textFieldValue.text.isEmpty() && !focusState) {
+                Text(
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .align(Alignment.CenterStart),
+                    text = "Search..",
+                    style = MaterialTheme.typography.body1.copy(color = disableContentColor)
+                )
+            }
         }
     }
 }
@@ -125,7 +156,10 @@ private fun PuppyListView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(4.dp, shape = RoundedCornerShape(8.dp), clip = false)
-                            .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(8.dp))
+                            .background(
+                                MaterialTheme.colors.surface,
+                                shape = RoundedCornerShape(8.dp)
+                            )
                     )
                 }
             }
@@ -137,7 +171,8 @@ private fun PuppyListView(
 fun PuppyRowItem(puppy: Puppy, modifier: Modifier) {
     Row(modifier = modifier.padding(12.dp)) {
         GlideImage(
-            data = puppy.photo,
+            data = puppy.photoUrl,
+            contentScale = ContentScale.Crop,
             contentDescription = null,
             modifier = Modifier
                 .size(120.dp)

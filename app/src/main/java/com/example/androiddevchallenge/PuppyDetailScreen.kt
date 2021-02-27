@@ -138,7 +138,7 @@ private fun puppyDetail(puppy: Puppy) {
     ) {
         Column {
             GlideImage(
-                data = puppy.photo,
+                data = puppy.photoUrl,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
                 modifier = Modifier

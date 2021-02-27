@@ -15,10 +15,8 @@
  */
 package com.example.androiddevchallenge.data.model
 
-import androidx.annotation.DrawableRes
-
 data class Puppy(
-    val id: Int,
+    val id: String,
     val name: String,
     val breed: String,
     val origin: String,
@@ -29,5 +27,5 @@ data class Puppy(
     val ownerName: String,
     val location: String,
     val details: String,
-    @DrawableRes val photo: Int,
+    val photoUrl: String,
 )

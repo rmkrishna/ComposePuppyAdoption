@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     composable("puppy/{id}") { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getInt("id", 0)
+                        val id = navBackStackEntry.arguments?.getString("id")
                         val puppy = puppies.first { it.id == id }
                         DetailScreen(puppy) {
                             navController.popBackStack()
